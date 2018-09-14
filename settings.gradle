@@ -1,1 +1,1 @@
-include ':app', ':common', ':superglue', ':jit'
+include ':app', ':common', ':superglue', ':bluecast'
