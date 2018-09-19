@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">AndroidGlue</string>
+    <string name="LeScanSwitch">Scan</string>
 </resources>
