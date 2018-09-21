@@ -5,8 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -18,14 +16,14 @@ import com.loki.superglue.djinni.bluecast.SuperGlueBlueCast;
 import com.loki.superglue.djinni.common.activity.CommonActivity;
 import com.loki.superglue.djinni.jni.BlueBeacon;
 import com.loki.superglue.djinni.jni.BlueDevice;
-import com.loki.superglue.djinni.jni.BlueViewCallback;
-import com.loki.superglue.djinni.jni.BlueViewController;
+import com.loki.superglue.djinni.jni.BlueViewMainCallback;
+import com.loki.superglue.djinni.jni.BlueViewMainController;
 
 import java.util.ArrayList;
 
 public class MainActivity extends CommonActivity {
     private BroadcastReceiver receiver;
-    private BlueViewCallback blueView;
+    private BlueViewMainCallback blueView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +42,7 @@ public class MainActivity extends CommonActivity {
             blueView.onSelectDevice(blueDevice);
         }));
 
-        blueView = SuperGlueBlueCast.getBluetooth().getBluetoothCallback().onCreate(new BlueViewController() {
+        blueView = SuperGlueBlueCast.getBluetooth().getBluetoothCallback().onCreateMain(new BlueViewMainController() {
             @Override
             public void blueEnable(boolean enable) {
                 startActivity(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE));
@@ -65,6 +63,16 @@ public class MainActivity extends CommonActivity {
                 DeviceListAdaptar deviceListAdaptar = (DeviceListAdaptar)recyclerView.getAdapter();
                 runOnUiThread(() -> deviceListAdaptar.deviceListRemove(beacon));
             }
+
+            @Override
+            public void launchViewDisplay(BlueDevice device) {
+                Intent intent = new Intent(MainActivity.this, DisplayActivity.class);
+
+                intent.putExtra(DisplayActivity.DEVICE_ADDRESS_EXTRA, device.getAddress());
+                intent.putExtra(DisplayActivity.DEVICE_NAME_EXTRA, device.getName());
+
+                runOnUiThread(() -> startActivity(intent));
+            }
         }, getPermissionInterface());
 
         receiver = new BroadcastReceiver() {
@@ -84,7 +92,7 @@ public class MainActivity extends CommonActivity {
 
     @Override
     protected void onDestroy() {
-        SuperGlueBlueCast.getBluetooth().getBluetoothCallback().onDestroy();
+        SuperGlueBlueCast.getBluetooth().getBluetoothCallback().onDestroyMain();
 
         unregisterReceiver(receiver);
 
