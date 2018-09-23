@@ -17,7 +17,6 @@ public class DisplayActivity extends AppCompatActivity {
 
     private BlueViewDisplayCallback blueView;
 
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

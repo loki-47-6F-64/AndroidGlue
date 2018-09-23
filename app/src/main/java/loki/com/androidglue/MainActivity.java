@@ -37,9 +37,7 @@ public class MainActivity extends CommonActivity {
 
         RecyclerView recyclerView = findViewById(R.id.BeaconList);
         recyclerView.setAdapter(new DeviceListAdaptar(new ArrayList<>(), (View view) -> {
-            BlueDevice blueDevice = DeviceListAdaptar.getDevice(view);
-
-            blueView.onSelectDevice(blueDevice);
+            // Nothing to do here
         }));
 
         blueView = SuperGlueBlueCast.getBluetooth().getBluetoothCallback().onCreateMain(new BlueViewMainController() {
@@ -57,7 +55,7 @@ public class MainActivity extends CommonActivity {
             }
 
             @Override
-            public void beaconListRemove(BlueDevice beacon) {
+            public void beaconListRemove(BlueBeacon beacon) {
                 RecyclerView recyclerView = findViewById(R.id.BeaconList);
 
                 DeviceListAdaptar deviceListAdaptar = (DeviceListAdaptar)recyclerView.getAdapter();
@@ -74,20 +72,6 @@ public class MainActivity extends CommonActivity {
                 runOnUiThread(() -> startActivity(intent));
             }
         }, getPermissionInterface());
-
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                blueView.onPowerStateChange(Bluetooth.fromPowerState(intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.STATE_OFF)));
-            }
-        };
-
-        registerReceiver(receiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
-
-//        DeviceListAdaptar deviceListAdaptar = (DeviceListAdaptar)recyclerView.getAdapter();
-
-//        deviceListAdaptar.deviceListUpdate(new BlueBeacon(new BlueDevice("hello", "world"), "uniqueId", 1, 2, 1.0d));
-//        deviceListAdaptar.deviceListUpdate(new BlueBeacon(new BlueDevice("dlrow", "olleh"), "dIeuqinu", 2, 1, 1.0d));
     }
 
     @Override

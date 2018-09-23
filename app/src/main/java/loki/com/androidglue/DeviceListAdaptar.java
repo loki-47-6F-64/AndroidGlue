@@ -1,6 +1,5 @@
 package loki.com.androidglue;
 
-import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
@@ -10,17 +9,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.loki.superglue.djinni.jni.BlueBeacon;
-import com.loki.superglue.djinni.jni.BlueDevice;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
 
-public class DeviceListAdaptar extends RecyclerView.Adapter<DeviceListAdaptar.DeviceViewHolder> {
-    public static class DeviceViewHolder extends RecyclerView.ViewHolder {
+public class DeviceListAdaptar extends RecyclerView.Adapter<DeviceListAdaptar.BeaconViewHolder> {
+    public static class BeaconViewHolder extends RecyclerView.ViewHolder {
         public ConstraintLayout layout;
 
-        public DeviceViewHolder(@NonNull ConstraintLayout v) {
+        public BeaconViewHolder(@NonNull ConstraintLayout v) {
             super(v);
 
             layout = v;
@@ -36,12 +33,8 @@ public class DeviceListAdaptar extends RecyclerView.Adapter<DeviceListAdaptar.De
     }
 
     private int indexOf(BlueBeacon beacon) {
-        return indexOf(beacon.getDevice());
-    }
-
-    private int indexOf(BlueDevice beacon) {
         for(int x = 0; x < dataset.size(); ++x) {
-            if(beacon.getAddress().equals(dataset.get(x).getDevice().getAddress())) {
+            if(beacon.getUuid().equals(dataset.get(x).getUuid())) {
                 return x;
             }
         }
@@ -64,7 +57,7 @@ public class DeviceListAdaptar extends RecyclerView.Adapter<DeviceListAdaptar.De
         notifyItemChanged(pos);
     }
 
-    public void deviceListRemove(@NonNull BlueDevice beacon) {
+    public void deviceListRemove(@NonNull BlueBeacon beacon) {
         int pos = indexOf(beacon);
 
         if(pos != -1) {
@@ -75,45 +68,28 @@ public class DeviceListAdaptar extends RecyclerView.Adapter<DeviceListAdaptar.De
 
     @NonNull
     @Override
-    public DeviceViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public BeaconViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // TextView textView = new TextView(parent.getContext());
         ConstraintLayout v = (ConstraintLayout)LayoutInflater.from(parent.getContext()).inflate(R.layout.device_list, parent, false);
 
-        return new DeviceViewHolder(v);
+        return new BeaconViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull DeviceViewHolder deviceViewHolder, int position) {
-        deviceViewHolder.layout.setOnClickListener(clickListener);
+    public void onBindViewHolder(@NonNull BeaconViewHolder beaconViewHolder, int position) {
+        beaconViewHolder.layout.setOnClickListener(clickListener);
 
-        setDevice(deviceViewHolder, dataset.get(position));
+        setBeacon(beaconViewHolder, dataset.get(position));
     }
 
-    private static void setDevice(DeviceViewHolder deviceViewHolder, BlueBeacon beacon) {
-        BlueDevice device = beacon.getDevice();
-
-        TextView bdaddr = (TextView)deviceViewHolder.layout.getViewById(R.id.bdaddr);
-        TextView name   = (TextView)deviceViewHolder.layout.getViewById(R.id.name);
-
-        TextView uuid          = (TextView)deviceViewHolder.layout.getViewById(R.id.uuid);
-        TextView major_minor   = (TextView)deviceViewHolder.layout.getViewById(R.id.major_minor);
-        TextView distance      = (TextView)deviceViewHolder.layout.getViewById(R.id.distance);
-
-        bdaddr.setText(device.getAddress());
-        name.setText(device.getName() == null ? "unknown" : device.getName());
+    private static void setBeacon(BeaconViewHolder beaconViewHolder, BlueBeacon beacon) {
+        TextView uuid          = (TextView) beaconViewHolder.layout.getViewById(R.id.uuid);
+        TextView major_minor   = (TextView) beaconViewHolder.layout.getViewById(R.id.major_minor);
+        TextView distance      = (TextView) beaconViewHolder.layout.getViewById(R.id.distance);
 
         uuid.setText(beacon.getUuid());
         major_minor.setText(String.valueOf(beacon.getMajor()).concat("_").concat(String.valueOf(beacon.getMinor())));
         distance.setText(new DecimalFormat("#.00 meters").format(beacon.getDistance()));
-    }
-
-    public static BlueDevice getDevice(View v) {
-        ConstraintLayout layout = (ConstraintLayout)v;
-
-        TextView bdaddr = (TextView)layout.getViewById(R.id.bdaddr);
-        TextView name   = (TextView)layout.getViewById(R.id.name);
-
-        return new BlueDevice(name.getText().toString(), bdaddr.getText().toString());
     }
 
     @Override
