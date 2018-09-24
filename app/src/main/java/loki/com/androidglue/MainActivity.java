@@ -22,7 +22,6 @@ import com.loki.superglue.djinni.jni.BlueViewMainController;
 import java.util.ArrayList;
 
 public class MainActivity extends CommonActivity {
-    private BroadcastReceiver receiver;
     private BlueViewMainCallback blueView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,8 +76,6 @@ public class MainActivity extends CommonActivity {
     @Override
     protected void onDestroy() {
         SuperGlueBlueCast.getBluetooth().getBluetoothCallback().onDestroyMain();
-
-        unregisterReceiver(receiver);
 
         super.onDestroy();
     }
