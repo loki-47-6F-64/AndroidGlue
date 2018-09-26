@@ -7,15 +7,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import com.loki.superglue.djinni.bluecast.SuperGlueBlueCast;
+import com.loki.superglue.djinni.jni.BlueCallback;
 import com.loki.superglue.djinni.jni.BlueDevice;
-import com.loki.superglue.djinni.jni.BlueViewDisplayCallback;
 import com.loki.superglue.djinni.jni.BlueViewDisplayController;
 
 public class DisplayActivity extends AppCompatActivity {
     public static final String DEVICE_ADDRESS_EXTRA = "androidglue.DEVICE_ADDRESS_EXTRA";
     public static final String DEVICE_NAME_EXTRA = "androidglue.DEVICE_NAME_EXTRA";
 
-    private BlueViewDisplayCallback blueView;
+    private BlueCallback blueCallback;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -28,7 +28,8 @@ public class DisplayActivity extends AppCompatActivity {
         String address = intent.getStringExtra(DEVICE_ADDRESS_EXTRA);
 
 
-        blueView = SuperGlueBlueCast.getBluetooth().getBluetoothCallback().onCreateDisplay(
+        blueCallback = SuperGlueBlueCast.getBluetooth().getBluetoothCallback();
+        blueCallback.onCreateDisplay(
                 new BlueDevice(name, address),
                 new BlueViewDisplayController() {
                     @Override
@@ -49,7 +50,7 @@ public class DisplayActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        SuperGlueBlueCast.getBluetooth().getBluetoothCallback().onDestroyDisplay();
+        blueCallback.onDestroyDisplay();
 
         super.onDestroy();
     }

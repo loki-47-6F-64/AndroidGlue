@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.loki.superglue.djinni.jni.BlueBeacon;
+import com.loki.superglue.djinni.jni.BlueDevice;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -24,46 +24,18 @@ public class DeviceListAdaptar extends RecyclerView.Adapter<DeviceListAdaptar.Be
         }
     }
 
-    private List<BlueBeacon> dataset;
+    private List<BlueDevice> dataset;
     private View.OnClickListener clickListener;
 
-    public DeviceListAdaptar(@NonNull List<BlueBeacon> dataset, @NonNull View.OnClickListener clickListener) {
+    public DeviceListAdaptar(@NonNull List<BlueDevice> dataset, @NonNull View.OnClickListener clickListener) {
         this.dataset = dataset;
         this.clickListener = clickListener;
     }
 
-    private int indexOf(BlueBeacon beacon) {
-        for(int x = 0; x < dataset.size(); ++x) {
-            if(beacon.getUuid().equals(dataset.get(x).getUuid())) {
-                return x;
-            }
-        }
+    public void setDataset(@NonNull List<BlueDevice> dataset) {
+        this.dataset = dataset;
 
-        return -1;
-    }
-
-    public void deviceListUpdate(@NonNull BlueBeacon beacon) {
-        int pos = indexOf(beacon);
-
-        if(pos == -1) {
-            dataset.add(beacon);
-
-            pos = dataset.size() -1;
-        }
-        else {
-            dataset.set(pos, beacon);
-        }
-
-        notifyItemChanged(pos);
-    }
-
-    public void deviceListRemove(@NonNull BlueBeacon beacon) {
-        int pos = indexOf(beacon);
-
-        if(pos != -1) {
-            dataset.remove(pos);
-            notifyItemRemoved(pos);
-        }
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -79,17 +51,24 @@ public class DeviceListAdaptar extends RecyclerView.Adapter<DeviceListAdaptar.Be
     public void onBindViewHolder(@NonNull BeaconViewHolder beaconViewHolder, int position) {
         beaconViewHolder.layout.setOnClickListener(clickListener);
 
-        setBeacon(beaconViewHolder, dataset.get(position));
+        setDevice(beaconViewHolder, dataset.get(position));
     }
 
-    private static void setBeacon(BeaconViewHolder beaconViewHolder, BlueBeacon beacon) {
-        TextView uuid          = (TextView) beaconViewHolder.layout.getViewById(R.id.uuid);
-        TextView major_minor   = (TextView) beaconViewHolder.layout.getViewById(R.id.major_minor);
-        TextView distance      = (TextView) beaconViewHolder.layout.getViewById(R.id.distance);
+    public static BlueDevice getDevice(@NonNull View view) {
+        ConstraintLayout layout = (ConstraintLayout)view;
 
-        uuid.setText(beacon.getUuid());
-        major_minor.setText(String.valueOf(beacon.getMajor()).concat("_").concat(String.valueOf(beacon.getMinor())));
-        distance.setText(new DecimalFormat("#.00 meters").format(beacon.getDistance()));
+        TextView address = (TextView) layout.getViewById(R.id.device_address);
+        TextView name    = (TextView) layout.getViewById(R.id.device_name);
+
+        return new BlueDevice(name.getText().toString(), address.getText().toString());
+    }
+
+    private static void setDevice(BeaconViewHolder beaconViewHolder, BlueDevice device) {
+        TextView address = (TextView) beaconViewHolder.layout.getViewById(R.id.device_address);
+        TextView name    = (TextView) beaconViewHolder.layout.getViewById(R.id.device_name);
+
+        address.setText(device.getAddress());
+        name.setText(device.getName());
     }
 
     @Override
