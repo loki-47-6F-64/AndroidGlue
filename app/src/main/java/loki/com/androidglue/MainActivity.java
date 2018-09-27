@@ -35,8 +35,13 @@ public class MainActivity extends CommonActivity {
         recyclerView.setAdapter(new DeviceListAdaptar(new ArrayList<>(), (View view) -> {
             blueCallback.onSelectDevice(DeviceListAdaptar.getDevice(view));
         }));
+    }
 
-        blueCallback.onCreateMain(new BlueViewMainController() {
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        blueCallback.onStartMain(new BlueViewMainController() {
             @Override
             public void blueEnable(boolean enable) {
                 startActivity(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE));
@@ -63,9 +68,9 @@ public class MainActivity extends CommonActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        blueCallback.onDestroyMain();
+    protected void onStop() {
+        blueCallback.onStopMain();
 
-        super.onDestroy();
+        super.onStop();
     }
 }

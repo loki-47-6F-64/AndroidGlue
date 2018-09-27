@@ -23,13 +23,18 @@ public class DisplayActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_display);
 
+        blueCallback = SuperGlueBlueCast.getBluetooth().getBluetoothCallback();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
         Intent intent = getIntent();
         String name    = intent.getStringExtra(DEVICE_NAME_EXTRA);
         String address = intent.getStringExtra(DEVICE_ADDRESS_EXTRA);
 
-
-        blueCallback = SuperGlueBlueCast.getBluetooth().getBluetoothCallback();
-        blueCallback.onCreateDisplay(
+        blueCallback.onStartDisplay(
                 new BlueDevice(name, address),
                 new BlueViewDisplayController() {
                     @Override
@@ -49,9 +54,9 @@ public class DisplayActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        blueCallback.onDestroyDisplay();
+    protected void onStop() {
+        blueCallback.onStopDisplay();
 
-        super.onDestroy();
+        super.onStop();
     }
 }
